@@ -202,7 +202,12 @@ def preset_rubber_ducky() -> ProjectConfig:
                      "browser; nothing is uploaded."),
     )
 
+    # Use the clean hand-drawn figure (embedded verbatim) rather than a poor
+    # low-res trace of the product photo. image_path/labels are kept so flipping
+    # back to "trace" mode in the UI still has something to work from.
     cfg.figure = FigureConfig(
+        figure_mode="svg",
+        figure_svg_path=asset("handdrawn_ducky.svg"),
         image_path=asset("sample_ducky.png"),
         curve=True,
         rotate=0,

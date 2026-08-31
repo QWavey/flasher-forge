@@ -1,0 +1,274 @@
+<svg class="device" viewBox="-52 0 430 570" role="img" aria-labelledby="figtitle" xmlns="http://www.w3.org/2000/svg">
+          <title id="figtitle">NEW DUC v2.0 board, component side. USB-C at one end, USB-A at the other, with a microSD socket, the X1 crystal, the SW1 boot button and an eight-pad header between them. The microcontroller is on the reverse.</title>
+
+          <!-- Bundled styling: hand-drawn line hierarchy + cue layer, keyed to the
+               flasher's design tokens so it themes with whatever project embeds it.
+               This makes the figure self-contained (the host CSS needs no per-part
+               rules) while every colour still comes from the flasher's palette. -->
+          <style>
+            .device .shell, .device .board, .device .part {
+              fill: none; stroke: var(--white); stroke-linecap: round; stroke-linejoin: round; }
+            .device .shell { stroke-width: 1.5; }
+            .device .board { stroke-width: 1.5; }
+            .device .part  { stroke-width: 1.1; stroke: var(--gray-1); }
+            .device .card  { fill: none; stroke: var(--line-2); }
+            .device .card path { fill: none; stroke: var(--line-2); stroke-width: 1; }
+            .device .card .sd, .device .sd {
+              font-family: var(--font-mono); font-size: 22px; font-weight: 600;
+              fill: var(--line-2); text-anchor: middle; stroke: none; }
+            .device .fillpin { fill: var(--gray-2); stroke: none; }
+            .device .pins  { stroke: var(--gray-2); stroke-width: 0.9; }
+            .device .passive { fill: none; stroke: var(--line-2); stroke-width: 1; }
+            .device .ink   { fill: var(--gray-2); stroke: none; }
+            .device .drill { fill: var(--surface-2); }
+            .device .ghost { fill: none; stroke: var(--line-2); stroke-width: 1; stroke-dasharray: 5 4; }
+
+            .device .callout { fill: none; stroke: var(--line-2); stroke-width: 0.7;
+              stroke-dasharray: none; stroke-dashoffset: 0; animation: none;
+              transition: opacity var(--d-3, 520ms) var(--e-out, ease); }
+            .device .callout circle { fill: var(--gray-2); stroke: none; }
+            .device .callout circle.ledpin { fill: var(--led, #0A84FF); }
+            .device .callout text {
+              font-family: var(--font-mono); font-size: 23px; font-weight: 500;
+              letter-spacing: 0.02em; fill: var(--gray-2); stroke: none; opacity: 1; animation: none; }
+            .device .callout.end text { text-anchor: end; }
+            .device .callout text.sub { font-size: 20px; fill: var(--gray-2); }
+            body:not([data-step="0"]) .device .callout { opacity: 0; }
+
+            .device .boot rect, .device .boot circle, .device .boot path {
+              transition: stroke var(--d-2, 300ms) var(--e-out, ease); }
+            body[data-step="1"] .device .boot rect,
+            body[data-step="1"] .device .boot circle,
+            body[data-step="1"] .device .boot path { stroke: var(--accent); }
+
+            .device .led { fill: var(--led, #0A84FF); }
+            body[data-state="ok"]   .device .led { animation: ledBlink 1.4s steps(1, end) infinite; }
+            body[data-state="live"] .device .led { animation: ledBlink 0.5s steps(1, end) infinite; }
+            @keyframes ledBlink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0.25; } }
+
+            /* cue layer — hidden until its state, driven by the host body attrs */
+            .device .fx > * { opacity: 0; }
+            .device .fx-data .fx-trace { fill: none; stroke: var(--line-2); stroke-width: 2; }
+            .device .fx-pk { fill: var(--white); opacity: 0; filter: drop-shadow(0 0 3px var(--accent)); }
+            .device .fx-pk.l { offset-path: path("M132 470 V438"); }
+            .device .fx-pk.r { offset-path: path("M168 470 V450 Q168 442 160 440 V438"); }
+            body[data-state="live"] .device .fx-data { opacity: 1; }
+            body[data-state="live"] .device .fx-pk { animation: fxpk 0.85s linear infinite; }
+            .device .fx-pk.d2 { animation-delay: 0.28s; } .device .fx-pk.d3 { animation-delay: 0.56s; }
+            @keyframes fxpk { 0% { offset-distance: 0%; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+
+            .device .fx-sink { fill: var(--accent); }
+            body[data-state="live"] .device .fx-sink { animation: fxsink 0.85s ease-in-out infinite; }
+            @keyframes fxsink { 0%, 100% { opacity: 0; } 55% { opacity: 0.2; } }
+
+            .device .fx-press .fx-arrow { fill: none; stroke: var(--white); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+            .device .fx-press .fx-ring  { fill: none; stroke: var(--white); stroke-width: 2; }
+            .device .fx-press .fx-arrow, .device .fx-press .fx-ring { transform-box: fill-box; transform-origin: center; }
+            body[data-step="1"] .device .fx-press { opacity: 1; }
+            body[data-step="1"] .device .fx-press .fx-arrow { animation: fxpress 1.5s var(--e-apple, ease) infinite; }
+            body[data-step="1"] .device .fx-press .fx-ring  { animation: fxring 1.5s var(--e-apple, ease) infinite; }
+            @keyframes fxpress { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(5px); opacity: 1; } }
+            @keyframes fxring  { 0% { transform: scale(0.65); opacity: 0.9; } 70%, 100% { transform: scale(1.3); opacity: 0; } }
+
+            .device .fx-check circle   { fill: none; stroke: var(--ok); stroke-width: 2.5; }
+            .device .fx-check .fx-tick { fill: none; stroke: var(--ok); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 44; stroke-dashoffset: 44; }
+            body[data-state="ok"] .device .fx-check { opacity: 1; }
+            body[data-state="ok"] .device .fx-check .fx-tick { animation: fxtick 0.5s var(--e-apple, ease) forwards; }
+            @keyframes fxtick { to { stroke-dashoffset: 0; } }
+
+            .device .fx-port .fx-shroud { fill: none; stroke: var(--gray-2); stroke-width: 1.5; }
+            .device .fx-port path       { stroke: var(--gray-2); stroke-width: 1.5; fill: none; }
+            body[data-state="ok"] .device .fx-port { opacity: 1; animation: fxseat 0.5s var(--e-apple, ease); }
+            @keyframes fxseat { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+            @media (prefers-reduced-motion: reduce) {
+              .device .fx-data, .device .fx-pk, .device .fx-press, .device .fx-port { display: none; }
+            }
+          </style>
+
+          <!-- USB-C plug. Built the same way as the USB-A end below: shell,
+               rolled tip edge, folded side seams. What tells them apart is
+               what is true of the real parts: this one is much narrower and has
+               latch dimples where USB-A has two stamped windows. -->
+          <g class="shell">
+            <rect x="117" y="14" width="66" height="66" rx="3.5"/>
+            <path d="M117 24 H183"/>
+            <path d="M126 24 V80 M174 24 V80"/>
+            <rect x="132" y="46" width="14" height="6" rx="3"/>
+            <rect x="154" y="46" width="14" height="6" rx="3"/>
+          </g>
+          <g class="part">
+            <rect x="102" y="80" width="96" height="16" rx="2"/>
+            <path d="M112 80 V96 M188 80 V96"/>
+            <path d="M124 84 V92 M136 84 V92 M148 84 V92 M160 84 V92 M172 84 V92"/>
+          </g>
+
+          <!-- board -->
+          <g class="board">
+            <rect x="74" y="96" width="152" height="356" rx="4"/>
+          </g>
+
+          <!-- microSD push-push socket: stamped-steel cage, the inserted card
+               with its cut corner and label, and the row of gold contacts on
+               the exposed lower lip. Matches the real socket close-up. -->
+          <g class="part">
+            <rect x="80" y="110" width="140" height="128" rx="2"/>
+            <path d="M80 122 H220 M80 226 H220"/>
+            <path d="M92 110 V98 H128 V110 M170 110 V98 H206 V110"/>
+            <circle cx="150" cy="116" r="2.4" class="fillpin"/>
+          </g>
+          <!-- inserted card, cut corner top-right -->
+          <g class="card">
+            <path d="M96 128 H188 L204 144 V208 H96 Z"/>
+            <path d="M96 140 H204"/>
+            <text x="150" y="180" class="sd">12</text>
+          </g>
+          <!-- exposed contact fingers on the lower lip -->
+          <g class="pins">
+            <path d="M104 232 V244 M114 232 V244 M124 232 V244 M134 232 V244 M144 232 V244 M154 232 V244 M164 232 V244 M174 232 V244"/>
+          </g>
+          <g class="passive">
+            <rect x="100" y="222" width="11" height="9" rx="2"/>
+            <rect x="114" y="222" width="11" height="9" rx="2"/>
+            <rect x="128" y="222" width="11" height="9" rx="2"/>
+            <rect x="142" y="222" width="11" height="9" rx="2"/>
+            <rect x="156" y="222" width="11" height="9" rx="2"/>
+            <rect x="170" y="222" width="11" height="9" rx="2"/>
+            <rect x="184" y="222" width="11" height="9" rx="2"/>
+            <rect x="198" y="222" width="11" height="9" rx="2"/>
+            <rect x="74" y="132" width="10" height="18" rx="1"/>
+            <rect x="216" y="132" width="10" height="18" rx="1"/>
+            <rect x="74" y="214" width="10" height="18" rx="1"/>
+            <rect x="216" y="214" width="10" height="18" rx="1"/>
+          </g>
+
+          <!-- status LED -->
+          <g class="part"><rect x="190" y="244" width="16" height="12" rx="1"/></g>
+          <circle class="led" cx="198" cy="250" r="3.6"/>
+
+          <!-- X1 crystal, left edge -->
+          <g class="part">
+            <rect x="84" y="284" width="46" height="46" rx="3"/>
+            <rect x="92" y="292" width="30" height="30" rx="2" class="card"/>
+          </g>
+          <g class="passive">
+            <rect x="80" y="288" width="8" height="12" rx="1"/>
+            <rect x="126" y="288" width="8" height="12" rx="1"/>
+            <rect x="80" y="314" width="8" height="12" rx="1"/>
+            <rect x="126" y="314" width="8" height="12" rx="1"/>
+          </g>
+
+          <!-- SW1 boot button, right edge -->
+          <g class="part boot" id="figBoot">
+            <rect x="146" y="288" width="50" height="50" rx="3"/>
+            <circle cx="171" cy="313" r="14"/>
+            <path d="M151 288 v-6 M191 288 v-6 M151 338 v6 M191 338 v6"/>
+          </g>
+
+          <!-- passives between the parts -->
+          <g class="passive">
+            <rect x="138" y="262" width="9" height="14" rx="1"/>
+            <rect x="160" y="262" width="9" height="14" rx="1"/>
+            <rect x="182" y="262" width="9" height="14" rx="1"/>
+            <rect x="138" y="352" width="14" height="9" rx="1"/>
+            <rect x="108" y="352" width="14" height="9" rx="1"/>
+            <rect x="176" y="350" width="9" height="14" rx="1"/>
+            <rect x="176" y="374" width="9" height="14" rx="1"/>
+            <rect x="86" y="266" width="9" height="14" rx="1"/>
+          </g>
+
+          <!-- test points -->
+          <g class="ink">
+            <circle cx="88" cy="392" r="3"/>
+            <circle cx="88" cy="408" r="3"/>
+          </g>
+
+          <!-- eight-pad header, right edge -->
+          <g class="ink">
+            <circle cx="209" cy="300" r="4"/><circle cx="209" cy="316" r="4"/>
+            <circle cx="209" cy="332" r="4"/><circle cx="209" cy="348" r="4"/>
+            <circle cx="209" cy="364" r="4"/><circle cx="209" cy="380" r="4"/>
+            <circle cx="209" cy="396" r="4"/><circle cx="209" cy="412" r="4"/>
+          </g>
+
+          <!-- microcontroller, reverse side: hidden-line convention -->
+          <rect class="ghost" x="104" y="376" width="62" height="62" rx="2"/>
+
+          <!-- the two large vias by the USB-A end -->
+          <g class="ink">
+            <circle cx="92" cy="430" r="6.5"/>
+            <circle cx="92" cy="430" r="2.6" class="drill"/>
+            <circle cx="208" cy="430" r="6.5"/>
+            <circle cx="208" cy="430" r="2.6" class="drill"/>
+          </g>
+
+          <!-- USB-A plug -->
+          <g class="part">
+            <rect x="84" y="440" width="20" height="15" rx="2"/>
+            <rect x="196" y="440" width="20" height="15" rx="2"/>
+          </g>
+          <g class="shell">
+            <rect x="99" y="452" width="102" height="92" rx="2"/>
+            <path d="M99 536 H201"/>
+            <path d="M109 458 V536 M191 458 V536"/>
+            <path d="M99 494 h12 v18 h-12"/>
+            <path d="M201 494 h-12 v18 h12"/>
+            <rect x="120" y="476" width="24" height="26" rx="3"/>
+            <rect x="156" y="476" width="24" height="26" rx="3"/>
+          </g>
+
+          <!-- state FX layer: press hint, data flow, connected badge, port -->
+          <g class="fx">
+            <g class="fx-data">
+              <path class="fx-trace l" d="M132 470 V438"/>
+              <path class="fx-trace r" d="M168 470 V450 Q168 442 160 440 V438"/>
+              <circle class="fx-pk l"    r="3.2"/><circle class="fx-pk l d2" r="3.2"/><circle class="fx-pk l d3" r="3.2"/>
+              <circle class="fx-pk r"    r="3.2"/><circle class="fx-pk r d2" r="3.2"/><circle class="fx-pk r d3" r="3.2"/>
+            </g>
+            <rect class="fx-sink" x="104" y="376" width="62" height="62" rx="2"/>
+            <g class="fx-press">
+              <circle class="fx-ring" cx="171" cy="313" r="20"/>
+              <path class="fx-arrow" d="M171 276 v20 M163 288 l8 8 l8 -8"/>
+            </g>
+            <g class="fx-check">
+              <circle cx="330" cy="70" r="20"/>
+              <path class="fx-tick" d="M320 70 l7 8 l14 -16"/>
+            </g>
+            <g class="fx-port">
+              <path d="M96 548 H110 M190 548 H204"/>
+              <rect class="fx-shroud" x="95" y="540" width="110" height="24" rx="2"/>
+            </g>
+          </g>
+
+          <!-- callouts -->
+          <g class="callout">
+            <path d="M187 57 H262"/><circle cx="187" cy="57" r="3.4"/>
+            <text x="270" y="64">USB-C</text>
+
+            <path d="M220 178 H262"/><circle cx="220" cy="178" r="3.4"/>
+            <text x="270" y="170">microSD</text>
+            <text x="270" y="198" class="sub">payload</text>
+
+            <path d="M204 250 H262"/><circle cx="204" cy="250" r="3.4" class="ledpin"/>
+            <text x="270" y="254">LED</text>
+
+            <path d="M196 313 H262"/><circle cx="196" cy="313" r="3.4"/>
+            <text x="270" y="305">SW1</text>
+            <text x="270" y="333" class="sub">boot</text>
+
+            <path d="M213 396 H262"/><circle cx="213" cy="396" r="3.4"/>
+            <text x="270" y="403">header</text>
+
+            <path d="M201 498 H262"/><circle cx="201" cy="498" r="3.4"/>
+            <text x="270" y="505">USB-A</text>
+          </g>
+          <g class="callout end">
+            <path d="M84 307 H50"/><circle cx="84" cy="307" r="3.4"/>
+            <text x="42" y="299">X1</text>
+            <text x="42" y="327" class="sub">12 MHz</text>
+
+            <path d="M104 407 H50"/><circle cx="104" cy="407" r="3.4"/>
+            <text x="42" y="399">MCU</text>
+            <text x="42" y="427" class="sub">reverse</text>
+          </g>
+        </svg>

@@ -135,6 +135,15 @@ class FigureConfig:
     labels: List[LabelPoint] = field(default_factory=list)
     spec_rows: List[SpecRow] = field(default_factory=list)   # left-slab spec table
 
+    # ---- dimension lines (engineering-drawing style) ----
+    dim_length: str = ""            # length value on the vertical (right-side) dim line
+    dim_width: str = ""             # width value on the horizontal (bottom) dim line
+    dim_unit: str = "mm"            # unit label shown after each value (mm/cm/m)
+
+    # ---- figure source mode ----
+    figure_mode: str = "trace"      # "trace" = vectorise a photo, "svg" = embed a file
+    figure_svg_path: str = ""       # a ready-made <svg class="device"> file, embedded verbatim
+
     def image_source(self) -> str:
         """The source the tracer should read (URL wins if set)."""
         return self.image_url.strip() or self.image_path.strip()

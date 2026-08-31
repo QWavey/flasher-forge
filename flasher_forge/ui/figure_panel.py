@@ -27,6 +27,10 @@ from .common import (
 from .tables import SimpleTable
 from .workers import PreviewWorker
 
+# figure_mode value <-> human label shown in the combo
+_MODE_LABELS = {"trace": "Trace image", "svg": "Use SVG file"}
+_MODE_VALUES = {v: k for k, v in _MODE_LABELS.items()}
+
 
 class ClickableImage(QLabel):
     """Shows the trace preview; a click reports image-relative (0..1) coords."""
@@ -103,6 +107,13 @@ class FigurePanel(ScrollPanel):
     def _build(self) -> None:
         ch = self._changed_reparse
 
+        mode = Card("Figure source", "Trace a product photo, or embed a ready-made SVG figure.")
+        self.figure_mode = make_combo(list(_MODE_LABELS.values()), on_change=self._mode_changed)
+        mode.row("Source mode", self.figure_mode,
+                 "Trace image: vectorise a photo. Use SVG file: embed a "
+                 "<svg class=\"device\"> verbatim (e.g. a hand-drawn figure).")
+        self.add_card(mode)
+
         src = Card("Image source", "A local photo or an image URL (URL wins if set).")
         self.image_path = make_line(on_change=ch)
         browse = PushButton("Browse…", icon=FIF.PHOTO)
@@ -115,7 +126,20 @@ class FigurePanel(ScrollPanel):
         src.row("Image file", row)
         self.image_url = make_line(on_change=ch)
         src.row("Image URL", self.image_url)
-        self.add_card(src)
+        self._card_src = self.add_card(src)
+
+        svgc = Card("SVG figure", "A ready-made <svg class=\"device\"> file, embedded "
+                                  "verbatim so the flasher's own CSS styles it — no tracing.")
+        self.figure_svg_path = make_line(on_change=self._changed)
+        browse_svg = PushButton("Browse…", icon=FIF.PHOTO)
+        browse_svg.clicked.connect(self._pick_svg)
+        rsvg = QWidget()
+        hsv = QHBoxLayout(rsvg)
+        hsv.setContentsMargins(0, 0, 0, 0)
+        hsv.addWidget(self.figure_svg_path, 1)
+        hsv.addWidget(browse_svg, 0)
+        svgc.row("SVG file", rsvg)
+        self._card_svg = self.add_card(svgc)
 
         params = Card("Trace parameters")
         self.curve = make_switch(True, on_change=ch)
@@ -133,7 +157,7 @@ class FigurePanel(ScrollPanel):
         params.row("Upscale low-res to", self.upscale)
         self.work_max = make_spin(1500, 600, 4000, 50, ch)
         params.row("Downscale above", self.work_max)
-        self.add_card(params)
+        self._card_params = self.add_card(params)
 
         prev = Card("Live preview", "Click the preview to drop a callout point.")
         self.preview = ClickableImage()
@@ -153,14 +177,24 @@ class FigurePanel(ScrollPanel):
         hb.addWidget(openbtn)
         hb.addStretch(1)
         prev.add(btns)
-        self.add_card(prev)
+        self._card_prev = self.add_card(prev)
 
         calls = Card("Callouts", "x/y are image-relative 0..1. Optional box = x0,y0,x1,y1.")
         self.labels = SimpleTable(["x", "y", "text", "box (x0,y0,x1,y1)"],
                                   defaults=["0.5", "0.5", "PART", ""])
         self.labels.changed.connect(self._changed_reparse)
         calls.add(self.labels)
-        self.add_card(calls)
+        self._card_calls = self.add_card(calls)
+
+        dims = Card("Dimensions", "Engineering-style length/width dimension lines drawn on "
+                                  "the figure. Leave blank for none.")
+        self.dim_length = make_line(on_change=self._changed)
+        dims.row("Length", self.dim_length, "Vertical dimension down the right side, e.g. 51.")
+        self.dim_width = make_line(on_change=self._changed)
+        dims.row("Width", self.dim_width, "Horizontal dimension across the bottom, e.g. 18.")
+        self.dim_unit = make_combo(["mm", "cm", "m"], on_change=self._changed)
+        dims.row("Unit", self.dim_unit)
+        self._card_dims = self.add_card(dims)
 
         specs = Card("Caption & spec table")
         self.caption = make_line(on_change=self._changed)
@@ -171,17 +205,53 @@ class FigurePanel(ScrollPanel):
         specs.add(self.spec)
         self.add_card(specs)
 
+        self._apply_mode()
+
     def _pick_image(self) -> None:
         f, _ = QFileDialog.getOpenFileName(self, "Choose product image", "",
                                            "Images (*.png *.jpg *.jpeg *.webp *.bmp)")
         if f:
             self.image_path.setText(f)
 
+    def _pick_svg(self) -> None:
+        f, _ = QFileDialog.getOpenFileName(self, "Choose device SVG", "",
+                                           "SVG figure (*.svg *.svg.html *.html)")
+        if f:
+            self.figure_svg_path.setText(f)
+
+    # ------------------------------------------------------------------ mode
+    def _current_mode(self) -> str:
+        return _MODE_VALUES.get(self.figure_mode.currentText(), "trace")
+
+    def _apply_mode(self) -> None:
+        """Show only the controls that matter for the chosen source mode."""
+        svg = self._current_mode() == "svg"
+        self._card_src.setVisible(not svg)
+        self._card_svg.setVisible(svg)
+        self._card_params.setVisible(not svg)
+        self._card_prev.setVisible(not svg)
+        self._card_calls.setVisible(not svg)
+        self._card_dims.setVisible(not svg)
+
+    def _mode_changed(self) -> None:
+        if self._loading:
+            return
+        self._apply_mode()
+        self.collect()
+        self.notify_change()
+        if self._current_mode() == "trace":
+            self._request_preview()
+
     # ------------------------------------------------------------------ bind
     def load(self, cfg: ProjectConfig) -> None:
         self._loading = True
         self.cfg = cfg
         fig = cfg.figure
+        self.figure_mode.setCurrentText(_MODE_LABELS.get(fig.figure_mode, "Trace image"))
+        self.figure_svg_path.setText(fig.figure_svg_path)
+        self.dim_length.setText(fig.dim_length)
+        self.dim_width.setText(fig.dim_width)
+        self.dim_unit.setCurrentText(fig.dim_unit or "mm")
         self.image_path.setText(fig.image_path)
         self.image_url.setText(fig.image_url)
         self.curve.setChecked(fig.curve)
@@ -195,10 +265,17 @@ class FigurePanel(ScrollPanel):
         self.labels.set_rows([[_fmt(l.x), _fmt(l.y), l.text, _box_str(l.box)] for l in fig.labels])
         self.spec.set_rows([[s.dt, s.dd] for s in fig.spec_rows])
         self._loading = False
-        self._request_preview()
+        self._apply_mode()
+        if self._current_mode() == "trace":
+            self._request_preview()
 
     def collect(self) -> None:
         fig = self.cfg.figure
+        fig.figure_mode = self._current_mode()
+        fig.figure_svg_path = self.figure_svg_path.text()
+        fig.dim_length = self.dim_length.text().strip()
+        fig.dim_width = self.dim_width.text().strip()
+        fig.dim_unit = self.dim_unit.currentText() or "mm"
         fig.image_path = self.image_path.text()
         fig.image_url = self.image_url.text()
         fig.curve = self.curve.isChecked()
@@ -233,6 +310,10 @@ class FigurePanel(ScrollPanel):
 
     def _run_preview(self) -> None:
         self.collect()
+        if self._current_mode() == "svg":
+            self.preview.clear_image("SVG file mode")
+            self.preview_status.setText("Embedding a ready SVG file — no trace preview.")
+            return
         if self._worker and self._worker.isRunning():
             self._debounce.start()
             return

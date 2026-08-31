@@ -629,13 +629,21 @@ def generate(cfg: ProjectConfig, out_dir: Optional[str] = None,
 
         # 1. figure
         figres = figengine.trace_figure(cfg.figure, title=cfg.device_name)
-        fx, boot_origin = figengine.build_fx(figres, cfg.design, cfg.prepare_step_index())
-        figure_svg = figengine.compose_svg(figres, fx)
+        dims_css = ""
+        if figres.embedded:
+            # a ready-made <svg class="device"> is dropped in verbatim: it carries
+            # its own cue layer, so we neither overlay fx nor add dimension lines.
+            figure_svg = figres.svg
+            boot_origin = "50% 55%"
+        else:
+            fx, boot_origin = figengine.build_fx(figres, cfg.design, cfg.prepare_step_index())
+            dims_markup, dims_css, dims_vb = figengine.build_dims(figres, cfg.figure)
+            figure_svg = figengine.compose_svg(figres, fx, extra=dims_markup, viewbox=dims_vb)
         res.figure_message = figres.message
         log("figure: " + figres.message)
 
         # 2. css
-        _write(os.path.join(out, "css", "style.css"), build_css(cfg, boot_origin))
+        _write(os.path.join(out, "css", "style.css"), build_css(cfg, boot_origin) + dims_css)
         # 3. js
         _write(os.path.join(out, "js", "flasher.js"), build_js(cfg))
         # 4. index.html
