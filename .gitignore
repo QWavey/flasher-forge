@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.mypy_cache/
+.pytest_cache/
+
+# Generated flasher projects (users pick their own output dir; these are common ones)
+/out/
+/output/
+/dist-site/
+*.generated/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

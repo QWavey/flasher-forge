@@ -1,0 +1,15 @@
+
+/* ---- reduced motion: state still reads, nothing slides ----------------- */
+@media (prefers-reduced-motion: reduce) {
+  body[data-step="{{BOOT_STEP}}"] .device { transform: none; }
+  .fx-data, .fx-pk, .fx-press { display: none; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important; animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important; transition-delay: 0ms !important;
+  }
+  .device .case, .device .chip, .device .edge, .device .detail, .device .fine, .device .callout {
+    stroke-dasharray: none !important; stroke-dashoffset: 0 !important;
+  }
+  .device .dot, .device .anchordot, .device .label { opacity: 1 !important; }
+}

@@ -1,0 +1,11 @@
+# FlasherForge runtime dependencies
+#
+# GUI:
+PyQt6>=6.6
+PyQt6-Fluent-Widgets>=1.5
+
+# Figure tracing engine (photo_to_figure):
+Pillow>=10.0
+numpy>=1.24
+opencv-python-headless>=4.8
+requests>=2.31

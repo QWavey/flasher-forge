@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{DEVICE_NAME}} WebFlasher</title>
+<meta name="description" content="{{META_DESCRIPTION}}">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="{{TOK_BLACK}}">
+<link rel="icon" type="{{FAVICON_TYPE}}" href="{{FAVICON_HREF}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="{{FONTS_HREF}}" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="{{BODY_CLASS}}">
+
+<noscript>
+  <p class="noscript">This flasher talks to the device from the page itself, so
+  it needs JavaScript enabled.</p>
+</noscript>
+
+<div class="stage">
+
+<article class="box" id="box">
+
+  <header class="box-top">
+    <div class="box-lead">
+      {{BACKLINK}}
+      <p class="brandline">{{BRAND_WORD_1}}<span class="sep">&middot;</span>{{BRAND_WORD_2}}
+        <span class="ver">{{VERSION_LABEL}}</span></p>
+    </div>
+    {{STATUS_PILL}}
+  </header>
+
+  <div class="box-body">
+
+    <aside class="slab">
+      <figure class="fig">
+        {{FIGURE_SVG}}
+        {{FIGCAPTION}}
+      </figure>
+      {{SPEC_TABLE}}
+    </aside>
+
+    <section class="panel">
+
+      <ol class="rail" id="rail" aria-label="Progress">
+        {{RAIL_ITEMS}}
+      </ol>
+
+      <div class="views" id="views">
+        {{VIEWS}}
+      </div>
+    </section>
+  </div>
+
+  <footer class="box-bot">
+    <p class="footstat" id="footStat" role="status" aria-live="polite">ready</p>
+    <div class="botbtns">
+      {{BOTTOM_BUTTONS}}
+    </div>
+  </footer>
+
+  {{DRAWERS}}
+
+</article>
+
+{{FOOTER_LEGAL}}
+
+</div>
+
+{{DRAW_ON_SCRIPT}}
+{{FLASHER_SCRIPT_TAG}}
+</body>
+</html>
