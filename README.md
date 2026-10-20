@@ -1,39 +1,20 @@
 # FlasherForge
 
-**FlasherForge** is a desktop GUI that generates complete, browser-based
-firmware-flasher web projects from a rich configuration UI. Point it at a product
-photo and some firmware, fill in the wizard text, pick a transport, and it writes
-a self-contained static site that flashes the device **directly from the browser**
-— WebSerial + esptool-js for ESP32, WebUSB DFU for AVR32, or a download-only page.
+FlasherForge is a desktop GUI that generates browser-based firmware flasher sites. Give it a product photo and a firmware image, fill in the wizard text, pick a transport, and it writes a static site that flashes the device directly from the browser. It supports WebSerial with esptool-js for ESP32, WebUSB DFU for AVR32, and a download-only page.
 
-The generated sites use an instrument-panel design language: a single bordered
-box on a true-black field, a traced line-figure of the device on the left, and a
-step-rail wizard (Brief → Prepare → Connect → Flash → Done) on the right, with
-the device figure reacting to the flow (boot highlight, data-flow, LED blink,
-flashing shimmer, connected check).
+The generated site has one bordered box on a black background. A traced line drawing of the device sits on the left, and a step rail (Brief → Prepare → Connect → Flash → Done) sits on the right. The device drawing reacts to each step: boot highlight, data flow, LED blink, a flashing shimmer, and a connected check.
 
-The device figure is produced by a vendored copy of the `photo_to_figure`
-tracer: it turns a photograph into an animated SVG line drawing with positioned
-callouts, and FlasherForge drives the figure's state cues from those callout
-coordinates.
+The device drawing comes from a vendored copy of the `photo_to_figure` tracer. It turns a photo into an animated SVG line drawing with positioned callouts. FlasherForge uses those callout coordinates to place the state cues.
 
 ## Features
 
-- **Seven configuration sections** (left sidebar): Project, Figure, Steps,
-  Firmware, Design, Presets, Generate — 90+ real options, every one of which
-  changes the generated output.
-- **Live figure preview** with click-to-drop callouts and full trace-parameter
-  control (wobble/straight, detail, orientation).
-- **Three transports**: ESP32 (WebSerial + esptool-js), AVR32 DFU (WebUSB), and
-  generic download-only. The ESP32 and DFU flows are adapted from proven,
-  working reference flashers.
-- **"Flash many devices"** batch mode: the generated flash view can re-arm after
-  each success to flash a whole batch.
-- **Hold-to-flash or click-to-flash**, per project.
-- **Presets** that populate every field, including two that mirror real
-  flashers (ESP32-S3 Key, USB Rubber Ducky). Save / duplicate / delete your own.
-- **Full theming**: accent/ok/err/LED colours, true-black toggle, font choices,
-  and per-cue figure toggles.
+- **Seven configuration sections** in the left sidebar: Project, Figure, Steps, Firmware, Design, Presets, and Generate. There are 90+ options, and each one changes the generated output.
+- **Live figure preview** with click-to-place callouts and trace controls (wobble or straight, detail, orientation).
+- **Three transports:** ESP32 (WebSerial + esptool-js), AVR32 DFU (WebUSB), and a generic download-only mode. The ESP32 and DFU flows are adapted from working reference flashers.
+- **Batch flashing:** the flash view can re-arm after each success, so you can flash a whole batch of devices.
+- **Hold-to-flash or click-to-flash**, set per project.
+- **Presets** that fill in every field. Two of them mirror real flashers (ESP32-S3 Key and USB Rubber Ducky). You can save, duplicate, and delete your own.
+- **Theming:** accent, OK, error, and LED colours, a true-black toggle, font choices, and per-cue figure toggles.
 
 ## Install
 
@@ -41,13 +22,9 @@ coordinates.
 pip install -r requirements.txt
 ```
 
-Requirements: **Python 3.11+** (works on 3.10), **PyQt6**, **PyQt6-Fluent-Widgets**
-(`qfluentwidgets`), plus the tracer's deps (**Pillow**, **numpy**,
-**opencv-python-headless**, **requests**).
+You need Python 3.11+ (3.10 also works), **PyQt6**, **PyQt6-Fluent-Widgets** (`qfluentwidgets`), and the tracer's dependencies: **Pillow**, **numpy**, **opencv-python-headless**, and **requests**.
 
-> The generator, config schema and figure engine run headless with only the
-> tracer deps installed. The GUI additionally needs `PyQt6` and
-> `PyQt6-Fluent-Widgets`; install those two to launch the desktop app.
+The generator, config schema, and figure engine run headless with only the tracer dependencies installed. The GUI also needs `PyQt6` and `PyQt6-Fluent-Widgets`.
 
 ## Run
 
@@ -57,9 +34,9 @@ python -m flasher_forge
 python app.py
 ```
 
-## Generate from the command line / headless
+## Generate without the GUI
 
-The generator is a plain function and needs no GUI:
+The generator is a plain function:
 
 ```python
 from flasher_forge.forge import presets, generator
@@ -70,10 +47,7 @@ result = generator.generate(cfg, clean=True)
 print(result.ok, result.tree_text())
 ```
 
-The generated project is a static site: serve it over HTTP (WebSerial/WebUSB
-need a secure context — `http://localhost` counts) and open it in Chrome or Edge.
-The Generate panel's "Open in browser" button starts a local server for exactly
-this.
+The generated project is a static site. Serve it over HTTP, because WebSerial and WebUSB need a secure context (`http://localhost` counts), and open it in Chrome or Edge. The Generate panel's "Open in browser" button starts a local server for this.
 
 ## Project layout
 
@@ -102,24 +76,20 @@ flasher-forge/
 
 ## How the generator works
 
-`ProjectConfig` (a set of dataclasses in `forge/config.py`) is both the in-memory
-model and the on-disk preset format (JSON). `generator.generate(cfg, out)`:
+`ProjectConfig` is a set of dataclasses in `forge/config.py`. It is both the in-memory model and the on-disk preset format (JSON). `generator.generate(cfg, out)` does the following:
 
-1. traces the figure (`engine/figure.py` → `photo_to_figure`), lifts the inline
-   SVG, and builds a state-cue overlay positioned from the callout anchors;
-2. fills the CSS token system from the Design colours/fonts;
-3. assembles `index.html` from the config's steps, texts, figure and flags;
-4. writes the transport-specific `flasher.js` (with an injected `CONFIG` object);
-5. copies the firmware images + writes `manifest.json` (ESP32) or `firmware.hex`
-   (DFU), the esptool-js vendor bundle, the favicon, README and LICENSE.
+1. Traces the figure (`engine/figure.py` → `photo_to_figure`), lifts the inline SVG, and builds a state-cue overlay positioned from the callout anchors.
+2. Fills the CSS token system from the Design colours and fonts.
+3. Assembles `index.html` from the config's steps, texts, figure, and flags.
+4. Writes the transport-specific `flasher.js`, with an injected `CONFIG` object.
+5. Copies the firmware images, writes `manifest.json` (ESP32) or `firmware.hex` (DFU), and adds the esptool-js vendor bundle, the favicon, the README, and the LICENSE.
 
-Templating is a single explicit `{{TOKEN}}` pass with a hard error on any
-unresolved token, so the output is never silently broken.
+Templating is a single explicit `{{TOKEN}}` pass that fails hard on any unresolved token, so the output is never silently broken.
 
 ## Screenshots
 
-_(Add screenshots of the app and a generated flasher here.)_
+Coming soon.
 
 ## License
 
-MIT — © 2026 QWavey. See `LICENSE`.
+MIT. Copyright 2026 QWavey. See `LICENSE`.
